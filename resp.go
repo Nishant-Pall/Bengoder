@@ -2,14 +2,12 @@ package main
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 	"strconv"
 )
 
 const (
 	DICT = 'd'
-	END  = 'e'
 )
 
 type Value struct {
@@ -18,7 +16,6 @@ type Value struct {
 	bulk  string
 	value []Value
 }
-
 type Resp struct {
 	reader *bufio.Reader
 }
@@ -32,29 +29,28 @@ func (r *Resp) ReadLine() (byte, error) {
 	return line, err
 }
 
-func (r *Resp) Decode() {
+func (r *Resp) Decode() (Value, error) {
 
 	line, err := r.ReadLine()
 	if err != nil {
-		return
+		return Value{}, nil
 	}
 
 	switch line {
 	case DICT:
-		r.DecodeDictionary()
-		return
+		return r.DecodeDictionary()
 	}
-
+	return Value{}, nil
 }
 
-func (r *Resp) DecodeDictionary() {
+func (r *Resp) DecodeDictionary() (Value, error) {
 	v := Value{}
 	v.typ = string(DICT)
 
 	for {
 		key, err := r.readLine()
 		if err != nil {
-			return
+			return Value{}, err
 		}
 		end, _ := r.reader.Peek(1)
 		var value = ""
@@ -62,13 +58,13 @@ func (r *Resp) DecodeDictionary() {
 			val, err := r.readInteger()
 			value = string(val)
 			if err != nil {
-				return
+				return Value{}, err
 			}
 		} else {
 			val, err := r.readLine()
 			value = val
 			if err != nil {
-				return
+				return Value{}, err
 			}
 		}
 
@@ -80,7 +76,7 @@ func (r *Resp) DecodeDictionary() {
 
 		v.value = append(v.value, val)
 
-		fmt.Println(v)
+		return val, nil
 	}
 }
 

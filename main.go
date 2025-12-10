@@ -15,5 +15,11 @@ func main() {
 	defer file.Close()
 
 	reader := newResp(file)
-	reader.Decode()
+	val, err := reader.Decode()
+
+	if err != nil {
+		return
+	}
+
+	fmt.Println(val)
 }
