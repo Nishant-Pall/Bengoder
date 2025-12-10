@@ -15,5 +15,5 @@ func main() {
 	defer file.Close()
 
 	reader := newResp(file)
-	reader.Read()
+	reader.Decode()
 }

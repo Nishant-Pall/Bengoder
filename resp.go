@@ -32,7 +32,7 @@ func (r *Resp) ReadLine() (byte, error) {
 	return line, err
 }
 
-func (r *Resp) Read() {
+func (r *Resp) Decode() {
 
 	line, err := r.ReadLine()
 	if err != nil {
@@ -56,9 +56,20 @@ func (r *Resp) DecodeDictionary() {
 		if err != nil {
 			return
 		}
-		value, err := r.readLine()
-		if err != nil {
-			return
+		end, _ := r.reader.Peek(1)
+		var value = ""
+		if string(end) == "i" {
+			val, err := r.readInteger()
+			value = string(val)
+			if err != nil {
+				return
+			}
+		} else {
+			val, err := r.readLine()
+			value = val
+			if err != nil {
+				return
+			}
 		}
 
 		val := Value{}
@@ -68,12 +79,30 @@ func (r *Resp) DecodeDictionary() {
 		val.bulk = value
 
 		v.value = append(v.value, val)
+
 		fmt.Println(v)
 	}
 }
 
+func (r *Resp) readInteger() (integer []byte, err error) {
+	r.reader.ReadByte()
+	for {
+		char, err := r.reader.ReadByte()
+		if err != nil {
+			return nil, err
+		}
+
+		if string(char) == "e" {
+			break
+		}
+
+		integer = append(integer, char)
+	}
+	return integer, nil
+}
+
 func (r *Resp) readLine() (string, error) {
-	len, err := r.readInteger()
+	len, err := r.readLength()
 	if err != nil {
 		return "", err
 	}
@@ -94,7 +123,7 @@ func (r *Resp) readLine() (string, error) {
 	return string(line), nil
 }
 
-func (r *Resp) readInteger() (line []byte, err error) {
+func (r *Resp) readLength() (line []byte, err error) {
 	for {
 		char, err := r.reader.ReadByte()
 		if err != nil {
