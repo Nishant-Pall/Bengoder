@@ -6,16 +6,14 @@ import (
 	"strconv"
 )
 
+type Value map[string]interface{}
+
 const (
-	DICT = 'd'
+	DICT        = 'd'
+	INT         = 'i'
+	BYTE_STRING = "bs"
 )
 
-type Value struct {
-	typ   string
-	key   string
-	bulk  string
-	value []Value
-}
 type Resp struct {
 	reader *bufio.Reader
 }
@@ -24,19 +22,19 @@ func newResp(rd io.Reader) *Resp {
 	return &Resp{reader: bufio.NewReader(rd)}
 }
 
-func (r *Resp) ReadLine() (byte, error) {
+func (r *Resp) ReadChar() (byte, error) {
 	line, err := r.reader.ReadByte()
 	return line, err
 }
 
 func (r *Resp) Decode() (Value, error) {
 
-	line, err := r.ReadLine()
+	char, err := r.ReadChar()
 	if err != nil {
 		return Value{}, nil
 	}
 
-	switch line {
+	switch char {
 	case DICT:
 		return r.DecodeDictionary()
 	}
@@ -44,60 +42,50 @@ func (r *Resp) Decode() (Value, error) {
 }
 
 func (r *Resp) DecodeDictionary() (Value, error) {
-	v := Value{}
-	v.typ = string(DICT)
+	value := Value{}
+	key, err := r.readBaseString()
 
-	for {
-		key, err := r.readLine()
-		if err != nil {
-			return Value{}, err
-		}
-		end, _ := r.reader.Peek(1)
-		var value = ""
-		if string(end) == "i" {
-			val, err := r.readInteger()
-			value = string(val)
-			if err != nil {
-				return Value{}, err
-			}
-		} else {
-			val, err := r.readLine()
-			value = val
-			if err != nil {
-				return Value{}, err
-			}
-		}
-
-		val := Value{}
-
-		val.typ = string(DICT)
-		val.key = key
-		val.bulk = value
-
-		v.value = append(v.value, val)
-
-		return val, nil
+	if err != nil {
+		return nil, err
 	}
-}
 
-func (r *Resp) readInteger() (integer []byte, err error) {
-	r.reader.ReadByte()
-	for {
-		char, err := r.reader.ReadByte()
+	peek, err := r.reader.Peek(1)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if string(peek) == "i" {
+		r.reader.ReadByte()
+		byteArr, err := r.readInteger()
+
 		if err != nil {
 			return nil, err
 		}
 
-		if string(char) == "e" {
-			break
+		intVal, err := strconv.Atoi(string(byteArr))
+
+		value[key] = intVal
+	} else if string(peek) == "d" {
+		val, err := r.Decode()
+		if err != nil {
+			return nil, err
 		}
 
-		integer = append(integer, char)
+		value[key] = val
+	} else {
+		val, err := r.readBaseString()
+		if err != nil {
+			return nil, err
+		}
+
+		value[key] = val
 	}
-	return integer, nil
+
+	return value, nil
 }
 
-func (r *Resp) readLine() (string, error) {
+func (r *Resp) readBaseString() (string, error) {
 	len, err := r.readLength()
 	if err != nil {
 		return "", err
@@ -117,6 +105,22 @@ func (r *Resp) readLine() (string, error) {
 	}
 
 	return string(line), nil
+}
+
+func (r *Resp) readInteger() (integer []byte, err error) {
+	for {
+		char, err := r.reader.ReadByte()
+		if err != nil {
+			return nil, err
+		}
+
+		if string(char) == "e" {
+			break
+		}
+
+		integer = append(integer, char)
+	}
+	return integer, nil
 }
 
 func (r *Resp) readLength() (line []byte, err error) {
