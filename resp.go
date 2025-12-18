@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 	"strconv"
 )
@@ -80,7 +79,6 @@ func (r *Resp) DecodeDictionary() (Value, error) {
 				return nil, err
 			}
 
-			fmt.Printf("%v \r\n", val)
 			value[key] = val
 		} else {
 			val, err := r.readBaseString()
