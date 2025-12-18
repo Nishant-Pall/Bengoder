@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"io"
 	"strconv"
 )
@@ -43,45 +44,63 @@ func (r *Resp) Decode() (Value, error) {
 
 func (r *Resp) DecodeDictionary() (Value, error) {
 	value := Value{}
-	key, err := r.readBaseString()
 
-	if err != nil {
-		return nil, err
-	}
+	for {
 
-	peek, err := r.reader.Peek(1)
-
-	if err != nil {
-		return nil, err
-	}
-
-	if string(peek) == "i" {
-		r.reader.ReadByte()
-		byteArr, err := r.readInteger()
+		key, err := r.readBaseString()
 
 		if err != nil {
 			return nil, err
 		}
 
-		intVal, err := strconv.Atoi(string(byteArr))
+		peek, err := r.reader.Peek(1)
 
-		value[key] = intVal
-	} else if string(peek) == "d" {
-		val, err := r.Decode()
 		if err != nil {
 			return nil, err
 		}
 
-		value[key] = val
-	} else {
-		val, err := r.readBaseString()
+		if string(peek) == "e" {
+			break
+		}
+
+		if string(peek) == "i" {
+			r.reader.ReadByte()
+			byteArr, err := r.readInteger()
+
+			if err != nil {
+				return nil, err
+			}
+
+			intVal, err := strconv.Atoi(string(byteArr))
+
+			value[key] = intVal
+		} else if string(peek) == "d" {
+			val, err := r.Decode()
+			if err != nil {
+				return nil, err
+			}
+
+			fmt.Printf("%v \r\n", val)
+			value[key] = val
+		} else {
+			val, err := r.readBaseString()
+			if err != nil {
+				return nil, err
+			}
+
+			value[key] = val
+		}
+
+		peek2, err := r.reader.Peek(1)
+
 		if err != nil {
 			return nil, err
 		}
 
-		value[key] = val
+		if string(peek2) == "e" {
+			break
+		}
 	}
-
 	return value, nil
 }
 
@@ -113,7 +132,6 @@ func (r *Resp) readInteger() (integer []byte, err error) {
 		if err != nil {
 			return nil, err
 		}
-
 		if string(char) == "e" {
 			break
 		}

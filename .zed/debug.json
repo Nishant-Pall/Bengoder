@@ -1,0 +1,13 @@
+[
+    {
+        "adapter": "Delve",
+        "mode": "debug",
+        "label": "Launch main.go",
+        "request": "launch",
+        "subProcess": true,
+        "redirectOutput": true,
+        "program": "main.go",
+        "stopOnEntry": false,
+        "cwd": "${ZED_WORKTREE_ROOT}"
+    }
+]
