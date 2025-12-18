@@ -89,13 +89,13 @@ func (r *Resp) DecodeDictionary() (Value, error) {
 			value[key] = val
 		}
 
-		peek2, err := r.reader.Peek(1)
+		endPeek, err := r.reader.Peek(1)
 
 		if err != nil {
 			return nil, err
 		}
 
-		if string(peek2) == "e" {
+		if string(endPeek) == "e" {
 			break
 		}
 	}
