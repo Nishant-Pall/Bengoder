@@ -21,5 +21,5 @@ func main() {
 		return
 	}
 
-	fmt.Println(val)
+	fmt.Printf("%v \r\n", val)
 }

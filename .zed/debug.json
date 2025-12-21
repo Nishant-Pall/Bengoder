@@ -1,13 +1,13 @@
 [
     {
         "adapter": "Delve",
-        "mode": "debug",
-        "label": "Launch main.go",
+        "label": "run go server",
         "request": "launch",
-        "subProcess": true,
-        "redirectOutput": true,
-        "program": "main.go",
-        "stopOnEntry": false,
-        "cwd": "${ZED_WORKTREE_ROOT}"
+        "mode": "debug",
+        "program": ".",
+        "cwd": "${ZED_WORKTREE_ROOT}",
+        "args": ["-run-dev", "-no-open"],
+        "buildFlags": [],
+        "env": {}
     }
 ]
