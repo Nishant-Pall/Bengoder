@@ -34,16 +34,15 @@ func (r *Resp) Decode() (interface{}, error) {
 
 	switch char {
 	case DICT:
-		return r.DecodeDictionary()
+		return r.decodeDictionary()
 	case INT:
 		return r.readInteger()
 	default:
 		return r.readBaseString()
 	}
-
 }
 
-func (r *Resp) DecodeDictionary() (Value, error) {
+func (r *Resp) decodeDictionary() (Value, error) {
 	value := Value{}
 
 	r.reader.ReadByte()
