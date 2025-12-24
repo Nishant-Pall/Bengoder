@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"io"
 	"strconv"
 )
@@ -11,6 +12,7 @@ type Value map[string]interface{}
 const (
 	DICT = "d"
 	INT  = "i"
+	LIST = "l"
 )
 
 type Resp struct {
@@ -26,13 +28,15 @@ func (r *Resp) PeekChar() (string, error) {
 	return string(line), err
 }
 
-func (r *Resp) Decode() (interface{}, error) {
+func (r *Resp) Decode() (any, error) {
 	char, err := r.PeekChar()
 	if err != nil {
 		return Value{}, nil
 	}
 
 	switch char {
+	case LIST:
+		return r.decodeList()
 	case DICT:
 		return r.decodeDictionary()
 	case INT:
@@ -40,6 +44,32 @@ func (r *Resp) Decode() (interface{}, error) {
 	default:
 		return r.readBaseString()
 	}
+}
+
+func (r *Resp) decodeList() ([]any, error) {
+	r.reader.ReadByte()
+
+	var value []any
+	for {
+		val, err := r.Decode()
+		if err != nil {
+			return nil, err
+		}
+
+		value = append(value, val)
+
+		fmt.Printf("%v \r\n", val)
+		peek, err := r.reader.Peek(1)
+		fmt.Printf("%v \r\n", string(peek))
+		if err != nil {
+			return nil, err
+		}
+
+		if string(peek) == "e" {
+			break
+		}
+	}
+	return value, nil
 }
 
 func (r *Resp) decodeDictionary() (Value, error) {
