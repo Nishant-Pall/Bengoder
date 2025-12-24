@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 	"strconv"
 )
@@ -58,14 +57,13 @@ func (r *Resp) decodeList() ([]any, error) {
 
 		value = append(value, val)
 
-		fmt.Printf("%v \r\n", val)
 		peek, err := r.reader.Peek(1)
-		fmt.Printf("%v \r\n", string(peek))
 		if err != nil {
 			return nil, err
 		}
 
 		if string(peek) == "e" {
+			r.reader.ReadByte()
 			break
 		}
 	}
@@ -83,6 +81,7 @@ func (r *Resp) decodeDictionary() (Value, error) {
 		}
 
 		if string(peek) == "e" {
+			r.reader.ReadByte()
 			break
 		}
 
