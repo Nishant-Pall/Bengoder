@@ -6,10 +6,10 @@ import (
 )
 
 func main() {
-	file, err := os.Open(".torrent")
+	file, err := os.Open("./fixture/.torrent")
 
 	if err != nil {
-		fmt.Printf("%v", err)
+		fmt.Printf("%v \r\n", err)
 		return
 	}
 	defer file.Close()
