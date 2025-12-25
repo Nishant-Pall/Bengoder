@@ -1,27 +1,26 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 )
 
+func validateString(path *string) bool {
+	return *path != ""
+}
+
 func main() {
 
-	args := os.Args
+	pathPtr := flag.String("path", "", "path to torrent file")
+	flag.Parse()
 
-	if len(args) < 2 {
-		fmt.Printf("%v \r\n", "Please enter correct number of arguments")
-		return
-	}
-
-	filePath := os.Args[1]
-
-	if filePath == "" {
+	if !validateString(pathPtr) {
 		fmt.Printf("%v \r\n", "Path to torrent file cannot be emtpy")
 		return
 	}
 
-	file, err := os.Open(filePath)
+	file, err := os.Open(*pathPtr)
 
 	if err != nil {
 		fmt.Printf("%v \r\n", err)
