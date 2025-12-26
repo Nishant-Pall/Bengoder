@@ -100,15 +100,11 @@ func (r *Resp) decodeDictionary() (Value, error) {
 }
 
 func (r *Resp) readBaseString() (string, error) {
-	len, err := r.readLength()
+	length, err := r.readLength()
 	if err != nil {
 		return "", err
 	}
 
-	length, err := strconv.ParseInt(string(len), 10, 64)
-	if err != nil {
-		return "", err
-	}
 	line := make([]byte, int(length))
 
 	io.ReadFull(r.reader, line)
@@ -132,14 +128,20 @@ func (r *Resp) readInteger() (int, error) {
 	return intVal, nil
 }
 
-func (r *Resp) readLength() ([]byte, error) {
+func (r *Resp) readLength() (int64, error) {
 	line, err := r.readUntilDelim(byte(':'))
 
 	if err != nil {
-		return nil, err
+		return 0, err
 	}
 
-	return line, nil
+	length, err := strconv.ParseInt(string(line), 10, 64)
+
+	if err != nil {
+		return 0, err
+	}
+
+	return length, nil
 }
 
 func (r *Resp) readUntilDelim(delimiter byte) ([]byte, error) {
