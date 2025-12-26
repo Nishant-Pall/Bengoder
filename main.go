@@ -37,3 +37,14 @@ func main() {
 
 	fmt.Printf("%v \r\n", val)
 }
+
+func UnMarshallFile(rd *Resp) any {
+	val, err := rd.Decode()
+
+	if err != nil {
+		fmt.Printf("%v", err)
+		return nil
+	}
+
+	return val
+}
