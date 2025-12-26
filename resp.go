@@ -6,7 +6,7 @@ import (
 	"strconv"
 )
 
-type Value map[string]interface{}
+type Value map[string]any
 
 const (
 	DICT = "d"
