@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/Nishant-Pall/bengoder"
+	"github.com/Nishant-Pall/bengoder/bengoder"
 )
 
 func validateString(path *string) bool {
