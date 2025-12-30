@@ -7,8 +7,6 @@ import (
 	"strconv"
 )
 
-type Value map[string]any
-
 const (
 	DICT = "d"
 	INT  = "i"
@@ -31,7 +29,7 @@ func (r *Resp) PeekChar() (string, error) {
 func (r *Resp) Decode() (any, error) {
 	char, err := r.PeekChar()
 	if err != nil {
-		return Value{}, nil
+		return nil, nil
 	}
 
 	switch char {
@@ -71,8 +69,8 @@ func (r *Resp) decodeList() ([]any, error) {
 	return value, nil
 }
 
-func (r *Resp) decodeDictionary() (Value, error) {
-	value := Value{}
+func (r *Resp) decodeDictionary() (map[string]any, error) {
+	value := map[string]any{}
 
 	r.reader.ReadByte()
 	for {
