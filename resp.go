@@ -1,7 +1,8 @@
-package main
+package bengoder
 
 import (
 	"bufio"
+	"fmt"
 	"io"
 	"strconv"
 )
@@ -18,7 +19,7 @@ type Resp struct {
 	reader *bufio.Reader
 }
 
-func newResp(rd io.Reader) *Resp {
+func NewResp(rd io.Reader) *Resp {
 	return &Resp{reader: bufio.NewReader(rd)}
 }
 
@@ -156,4 +157,15 @@ func (r *Resp) readUntilDelim(delimiter byte) ([]byte, error) {
 	}
 
 	return byteArr, nil
+}
+
+func UnMarshallFile(rd *Resp) any {
+	val, err := rd.Decode()
+
+	if err != nil {
+		fmt.Printf("%v", err)
+		return nil
+	}
+
+	return val
 }

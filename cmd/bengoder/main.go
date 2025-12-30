@@ -4,6 +4,8 @@ import (
 	"flag"
 	"fmt"
 	"os"
+
+	"github.com/Nishant-Pall/bengoder"
 )
 
 func validateString(path *string) bool {
@@ -28,7 +30,7 @@ func main() {
 	}
 	defer file.Close()
 
-	reader := newResp(file)
+	reader := bengoder.NewResp(file)
 	val, err := reader.Decode()
 
 	if err != nil {
@@ -36,15 +38,4 @@ func main() {
 	}
 
 	fmt.Printf("%v \r\n", val)
-}
-
-func UnMarshallFile(rd *Resp) any {
-	val, err := rd.Decode()
-
-	if err != nil {
-		fmt.Printf("%v", err)
-		return nil
-	}
-
-	return val
 }

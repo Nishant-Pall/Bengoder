@@ -1,6 +1,6 @@
 run:
-	go run main.go resp.go
+	go run ./cmd/bengoder
 
 
 build:
-	go build -o bengode
+	go build -o bengode ./cmd/bengoder
