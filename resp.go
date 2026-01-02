@@ -157,21 +157,21 @@ func (r *Resp) readUntilDelim(delimiter byte) ([]byte, error) {
 	return byteArr, nil
 }
 
-func UnMarshallFile(r io.Reader) map[string]any {
+func UnMarshall(r io.Reader) (map[string]any, error) {
 	rd := NewResp(r)
 	val, err := rd.Decode()
 
 	if err != nil {
 		fmt.Printf("%v", err)
-		return nil
+		return nil, err
 	}
 
 	casted, ok := val.(map[string]any)
 
 	if !ok {
-		fmt.Printf("Error casting decoded value to type: map[string]any")
-		return nil
+
+		return nil, fmt.Errorf("Error casting decoded value to type: map[string]any")
 	}
 
-	return casted
+	return casted, nil
 }
